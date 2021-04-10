@@ -68,8 +68,8 @@
  
   if (ci.media_status == PJSUA_CALL_MEDIA_ACTIVE) {
   // When media is active, connect call to sound device.
-  pjsua_conf_connect(ci.conf_slot, 0);
-  pjsua_conf_connect(0, ci.conf_slot);
+  pjsua_conf_connect(ci.conf_slot, 10);
+  pjsua_conf_connect(10, ci.conf_slot);
   }
  }
  
@@ -149,15 +149,19 @@
   cfg.cred_info[0].data = pj_str(SIP_PASSWD);
  
   status = pjsua_acc_add(&cfg, PJ_TRUE, &acc_id);
-  if (status != PJ_SUCCESS) error_exit("Error adding account", status);
+  if (status != PJ_SUCCESS) {
+	 error_exit("Error adding account", status);
+  } else {
+	 printf ("add account success");
+  	}
   }
  
   /* If URL is specified, make call to the URL. */
-  if (argc > 1) {
-  pj_str_t uri = pj_str(argv[1]);
-  status = pjsua_call_make_call(acc_id, &uri, 0, NULL, NULL, NULL);
-  if (status != PJ_SUCCESS) error_exit("Error making call", status);
-  }
+//  if (argc > 1) {
+//  pj_str_t uri = pj_str(argv[1]);
+//  status = pjsua_call_make_call(acc_id, &uri, 0, NULL, NULL, NULL);
+//  if (status != PJ_SUCCESS) error_exit("Error making call", status);
+//  }
  
   /* Wait until user press "q" to quit. */
   for (;;) {

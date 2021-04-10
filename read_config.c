@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "read_config.h"
-inline void del_line(char *src){
+void del_line(char *src){
     if (src[strlen(src)-1] == '\n') src[strlen(src)-1] ='\0';
 }
 int find(char *src, char *key){
@@ -70,18 +70,18 @@ void read_config(struct config *ar_config, char *dir)
       }
       else if (strcmp(key, "domain") == 0){
         strcpy(ar_config[count].domain, value);
-        //printf("%s \n",ar_config[count].domain);
         del_line(ar_config[count].domain);
+        printf("%s \n",ar_config[count].domain);
       }
       else if (strcmp(key, "username") == 0){
         strcpy(ar_config[count].username, value);
-        //printf("%s \n",ar_config[count].username);
         del_line(ar_config[count].username);
+        printf("%s \n",ar_config[count].username);
       }
       else if (strcmp(key, "secret") == 0){
         strcpy(ar_config[count].secret, value);
-        ////printf("%s \n",ar_config[count].secret);
         del_line(ar_config[count].secret);
+        printf("%s \n",ar_config[count].secret);
       }
     }
   }

@@ -26,7 +26,7 @@ struct config{
     char realm[100];
     char domain[100];
 };
-inline void del_line(char *src);
+void del_line(char *src);
 int find(char *src, char *key);
 char *trim(char *src, int start, int end);
 void read_config(struct config *ar_config, char *dir);

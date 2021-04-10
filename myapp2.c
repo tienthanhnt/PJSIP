@@ -135,6 +135,7 @@ struct config ar_config[24];
  
   /* Register to SIP server by creating SIP account. */
   read_config(ar_config, "config");
+  printf("%s\n", ar_config[0].username);
   for (i = 0; i < 24 ; i++)
   {
   pjsua_acc_config cfg;
@@ -142,6 +143,7 @@ struct config ar_config[24];
   pjsua_acc_config_default(&cfg);
   char id[100];
   char reg_uri[100] = "sip:";
+  printf("account %d username %s", i, ar_config[i].username);
   sprintf(id,"sip:%s@%s", ar_config[i].username, ar_config[i].domain);
   cfg.id = pj_str(id);
   printf("%s\n" , cfg.id.ptr);
@@ -153,7 +155,7 @@ struct config ar_config[24];
   cfg.cred_info[0].scheme = pj_str((char *)"digest");
   cfg.cred_info[0].username = pj_str(ar_config[i].username);
   cfg.cred_info[0].data_type = PJSIP_CRED_DATA_PLAIN_PASSWD;
-  cfg.cred_info[0].data = pj_str(ar_config.secret);
+  cfg.cred_info[0].data = pj_str(ar_config[i].secret);
  
   status = pjsua_acc_add(&cfg, PJ_TRUE, &acc_id);
   if (status != PJ_SUCCESS) error_exit("Error adding account", status);
