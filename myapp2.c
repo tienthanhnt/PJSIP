@@ -18,96 +18,15 @@
 18  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 19  */
  
-#include <pjsua-lib/pjsua.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "read_config.h"
+#define THIS_FILE "APP"
 #define THIS_FILE "APP"
 
-#define SIP_DOMAIN "example.com"
-#define SIP_USER "alice"
-#define SIP_PASSWD "secret"
- 
- 
  /* read config file */
 struct config ar_config[24];
-int find(char *src, char *key){
-  int c;
-  int b;
-  char *str;
-  str = strstr(src,key);
-  if (str != NULL){
-    c = (int) src;
-    b = (int) str;
-  return b-c;
-  }
-  else return -1;
-}
-char *trim(char *src, int start, int end){
-  char *val;
-  val = malloc(end-start+1);
-  int i;
-  for (i = start; i < end; i++){
-    val[i-start] = (char)src[i]; 
-  }
-  return val;
-}
-void read_config()
-{
-   int num;
-   FILE *fptr;
-   int line_size;
-   char str_line[300];
-   int count = -1;;
-   int index = 0;
-   fptr = fopen("/home/runner/docfile/config","r");
- 
-   if(fptr == NULL)
-   {
-      printf("Error!");   
-      exit(1);             
-   }
-  while(fgets(str_line, 300, fptr) != NULL){
-    if (find(str_line, "account") != -1) count++;
-    index = find(str_line, "=");
-    if (index != -1){
-      char *key = trim(str_line,0,index);
-      char *value = trim(str_line, index + 1, strlen(str_line));
-      if (strcmp(key, "contact") == 0){
-        strcpy(ar_config[count].contact, trim(str_line,index+1,find(str_line,";transport")));
-        printf("%s ",ar_config[count].contact);
-      }
-      else if (strcmp(key, "sip_port") == 0){
-        ar_config[count].sip_port = atoi(value);
-        printf("%d ",ar_config[count].sip_port);
-      }
-      else if (strcmp(key, "sip_tcp_port") == 0){
-        ar_config[count].sip_tcp_port = atoi(value);
-        printf("%d ",ar_config[count].sip_tcp_port);
-      }
-      else if (strcmp(key, "sip_tls_port") == 0){
-        ar_config[count].sip_tls_port = atoi(value);
-        printf("%d ",ar_config[count].sip_tls_port);
-      }
-      else if (strcmp(key, "inc_timeout") == 0){
-        ar_config[count].inc_timeout = atoi(value);
-        printf("%d \n",ar_config[count].inc_timeout);
-      }
-      if (strcmp(key, "domain") == 0){
-        strcpy(ar_config[count].domain, value);
-        printf("%s \n",ar_config[count].domain);
-      }
-      if (strcmp(key, "domain") == 0){
-        strcpy(ar_config[count].domain, value);
-        printf("%s \n",ar_config[count].domain);
-      }
-      if (strcmp(key, "username") == 0){
-        strcpy(ar_config[count].username, value);
-        printf("%s \n",ar_config[count].username);
-      }
-    }
-  }
-}
  /* Callback called by the library upon receiving incoming call */
  static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
   pjsip_rx_data *rdata)
@@ -215,26 +134,26 @@ void read_config()
   if (status != PJ_SUCCESS) error_exit("Error starting pjsua", status);
  
   /* Register to SIP server by creating SIP account. */
-  read_config();
+  read_config(ar_config, "config");
   for (i = 0; i < 24 ; i++)
   {
   pjsua_acc_config cfg;
  
   pjsua_acc_config_default(&cfg);
-  char id[100] = "sip:";
+  char id[100];
   char reg_uri[100] = "sip:";
-  strcat(id, ar_config[i].username);
-  strcat(id, "@");
-  strcat(id, ar_config[i].domain);
+  sprintf(id,"sip:%s@%s", ar_config[i].username, ar_config[i].domain);
   cfg.id = pj_str(id);
-  strcat(reg_uri, ar_config[i].domain);
+  printf("%s\n" , cfg.id.ptr);
+  sprintf(reg_uri, "sip:%s", ar_config[i].domain);
   cfg.reg_uri = pj_str(reg_uri);
+  printf("%s\n" , cfg.reg_uri.ptr);
   cfg.cred_count = 1;
   cfg.cred_info[0].realm =  pj_str((char *)"*");
   cfg.cred_info[0].scheme = pj_str((char *)"digest");
   cfg.cred_info[0].username = pj_str(ar_config[i].username);
   cfg.cred_info[0].data_type = PJSIP_CRED_DATA_PLAIN_PASSWD;
-  cfg.cred_info[0].data = pj_str(SIP_PASSWD);
+  cfg.cred_info[0].data = pj_str(ar_config.secret);
  
   status = pjsua_acc_add(&cfg, PJ_TRUE, &acc_id);
   if (status != PJ_SUCCESS) error_exit("Error adding account", status);

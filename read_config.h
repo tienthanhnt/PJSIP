@@ -21,6 +21,7 @@ struct config{
     char reg_identity[100];
     /* auth_info */
     char username[100];
+    char secret[100];
     char ha1[100];
     char realm[100];
     char domain[100];
@@ -28,4 +29,4 @@ struct config{
 inline void del_line(char *src);
 int find(char *src, char *key);
 char *trim(char *src, int start, int end);
-void read_config(struct config *ar_config);
+void read_config(struct config *ar_config, char *dir);

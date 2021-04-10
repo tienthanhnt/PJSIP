@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "read_config.h"
-#define THIS_FILE "APP"
 
 #define SIP_DOMAIN "example.com"
 #define SIP_USER "alice"
@@ -34,13 +33,13 @@ struct config ar_config[24];
 
 
 int main(){
-    read_config(ar_config);
+    read_config(ar_config,"config");
     pjsua_acc_config cfg;
     //char *tmp = strcat(ar_config[0].username, "@");
     //char *tmp2 = strcat(tmp, ar_config[0].domain);
     
     //cfg.id = pj_str(strcat(a, tmp2));
-    //cfg.reg_uri = pj_str(strcat(a,ar_config[0].domain));
+    //cfg.reg_uri = pj_str(strcats(a,ar_config[0].domain));
     int i;
     for (i = 0; i < 24; i++ ){
         char id[100];
