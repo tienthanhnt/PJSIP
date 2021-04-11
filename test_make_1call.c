@@ -23,11 +23,8 @@
  #define THIS_FILE "APP"
  
  #define SIP_DOMAIN "192.168.1.198"
- #define SIP_USER_1 "996891"
- #define SIP_PASSWD_1 "Pin996891"
-
- #define SIP_USER_2 "996892"
- #define SIP_PASSWD_2 "Pin996892"
+ #define SIP_USER "996891"
+ #define SIP_PASSWD "Pin996891"
  
  
  /* Callback called by the library upon receiving incoming call */
@@ -73,6 +70,7 @@
   // When media is active, connect call to sound device.
   pjsua_conf_connect(ci.conf_slot, 0);
   pjsua_conf_connect(0, ci.conf_slot);
+    //pjsua_get_conference() // get_master_port
   }
  }
  
@@ -91,7 +89,7 @@
   */
  int main(int argc, char *argv[])
  {
-  pjsua_acc_id acc_id[2];
+  pjsua_acc_id acc_id;
   pj_status_t status;
  
   /* Create pjsua first! */
@@ -137,44 +135,39 @@
  
   /* Register to SIP server by creating SIP account. */
   {
-  pjsua_acc_config cfg[2];
+  pjsua_acc_config cfg;
  
-  pjsua_acc_config_default(&cfg[0]);
-  pjsua_acc_config_default(&cfg[1]);
-
-  cfg[0].id = pj_str("sip:" SIP_USER_1 "@" SIP_DOMAIN);
-  cfg[0].reg_uri = pj_str("sip:" SIP_DOMAIN);
-  cfg[0].cred_count = 1;
-  cfg[0].cred_info[0].realm = pj_str((char *)"*");
-  cfg[0].cred_info[0].scheme = pj_str((char *)"digest");
-  cfg[0].cred_info[0].username = pj_str(SIP_USER_1);
-  cfg[0].cred_info[0].data_type = PJSIP_CRED_DATA_PLAIN_PASSWD;
-  cfg[0].cred_info[0].data = pj_str(SIP_PASSWD_1);
+  pjsua_acc_config_default(&cfg);
+  cfg.id = pj_str("sip:" SIP_USER "@" SIP_DOMAIN);
+  cfg.reg_uri = pj_str("sip:" SIP_DOMAIN);
+  cfg.cred_count = 1;
+  cfg.cred_info[0].realm = pj_str((char *)"*");
+  cfg.cred_info[0].scheme = pj_str((char *)"digest");
+  cfg.cred_info[0].username = pj_str(SIP_USER);
+  cfg.cred_info[0].data_type = PJSIP_CRED_DATA_PLAIN_PASSWD;
+  cfg.cred_info[0].data = pj_str(SIP_PASSWD);
  
-
-  cfg[1].id = pj_str("sip:" SIP_USER_2 "@" SIP_DOMAIN);
-  cfg[1].reg_uri = pj_str("sip:" SIP_DOMAIN);
-  cfg[1].cred_count = 1;
-  cfg[1].cred_info[0].realm = pj_str((char *)"*");
-  cfg[1].cred_info[0].scheme = pj_str((char *)"digest");
-  cfg[1].cred_info[0].username = pj_str(SIP_USER_2);
-  cfg[1].cred_info[0].data_type = PJSIP_CRED_DATA_PLAIN_PASSWD;
-  cfg[1].cred_info[0].data = pj_str(SIP_PASSWD_2);
-
-
-  status = pjsua_acc_add(&cfg[0], PJ_TRUE, &acc_id[0]);
-  if (status != PJ_SUCCESS) error_exit("Error adding account 0", status);
-  status = pjsua_acc_add(&cfg[1], PJ_TRUE, &acc_id[1]);
-  if (status != PJ_SUCCESS) error_exit("Error adding account 1", status);
+  status = pjsua_acc_add(&cfg, PJ_TRUE, &acc_id);
+  if (status != PJ_SUCCESS) error_exit("Error adding account", status);
   }
  
   /* If URL is specified, make call to the URL. */
-  if (argc > 1) {
-  pj_str_t uri = pj_str(argv[1]);
-  status = pjsua_call_make_call(acc_id[0], &uri, 0, NULL, NULL, NULL);
-  status = pjsua_call_make_call(acc_id[1], &uri, 0, NULL, NULL, NULL);
+  PJ_LOG(1, (__FILE__, "Make call now"));
+  pjsua_call_id call_id = PJSUA_INVALID_ID;
+  char phone_c[100];
+  pjsua_msg_data msg_data;
+  pj_ansi_sprintf(phone_c, "<sip:%s@%s:%d>", "522601", "192.168.1.198", 5060);
+  pj_str_t dst_uri = pj_str(phone_c);
+
+  pjsua_msg_data_init(&msg_data);
+  status = pjsua_call_make_call(acc_id, &dst_uri, 0, NULL, &msg_data, &call_id);
   if (status != PJ_SUCCESS) error_exit("Error making call", status);
-  }
+
+  //if (argc > 1) {
+  //pj_str_t uri = pj_str(argv[1]);
+  //status = pjsua_call_make_call(acc_id, &uri, 0, NULL, NULL, NULL);
+  //if (status != PJ_SUCCESS) error_exit("Error making call", status);
+  //}
  
   /* Wait until user press "q" to quit. */
   for (;;) {
