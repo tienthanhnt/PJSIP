@@ -24,6 +24,36 @@ static void error_exit(const char *title, pj_status_t status)
     pjsua_destroy();
     exit(1);
 }
+int find(char *src, char *key)
+{
+    int c;
+    int b;
+    char *str;
+    str = strstr(src,key);
+    if (str != NULL){
+        c = (int) src;
+        b = (int) str;
+        return b-c;
+    }
+    return -1;
+}
+char *trim(char *src, int start, int end)
+{
+    char *val;
+    val = malloc(end-start+1);
+    for (int i = start; i < end; i++){
+        val[i-start] = (char)src[i];
+    }
+    return val;
+    }
+/* Get call number from call info */
+pj_str_t get_num_from_call(char *contact)
+{
+    pj_str_t val;
+    char *temp;
+    temp = trim(contact, find(contact, ":") + 1, find(contact, "@"));
+    val = pj_str(temp);
+}
 /* Callback called by the library upon receiving incoming call */
 static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id, pjsip_rx_data *rdata)
 {
@@ -50,18 +80,29 @@ static void on_call_state(pjsua_call_id call_id, pjsip_event *e)
 /* Callback called by the library when call's media state has changed */
 static void on_call_media_state(pjsua_call_id call_id)
 {
-    pjsua_call_info ci; 
-    pjsua_call_get_info(call_id, &ci); 
+    pjsua_call_info ci;
+    pj_str_t contact_number;
+    pjsua_call_get_info(call_id, &ci);
+    contact_number = get_num_from_call(ci.local_contact.ptr);
+
     if (ci.media_status == PJSUA_CALL_MEDIA_ACTIVE) {
-        pjsua_conf_connect(ci.conf_slot, 0);
-        pjsua_conf_connect(0, ci.conf_slot);
+        if (strcmp(contact_number.ptr, SIP_USER_0) == 0) {
+            // TODO: conncet to sound device
+            printf("================= match contact 0");
+        } else if (strcmp(contact_number.ptr, SIP_USER_1) == 0) {
+            printf("================= match contact 1");
+        } else if (strcmp(contact_number.ptr, SIP_USER_2) == 0) {
+            printf("================= match contact 2");
+        } else if (strcmp(contact_number.ptr, SIP_USER_3) == 0) {
+            printf("================= match contact 3");
+        }
     }
 }
 
 int main(int argc, char *argv[])
 {
     pjsua_acc_id acc_id;
-    pj_status_t status; 
+    pj_status_t status;
     /* Create pjsua first! */
     status = pjsua_create();
     if (status != PJ_SUCCESS) error_exit("Error in pjsua_create()", status);
@@ -69,19 +110,19 @@ int main(int argc, char *argv[])
     /* Init pjsua */
     {
         pjsua_config cfg;
-        pjsua_logging_config log_cfg; 
+        pjsua_logging_config log_cfg;
         pjsua_config_default(&cfg);
         cfg.cb.on_incoming_call = &on_incoming_call;
         cfg.cb.on_call_media_state = &on_call_media_state;
-        cfg.cb.on_call_state = &on_call_state; 
+        cfg.cb.on_call_state = &on_call_state;
         pjsua_logging_config_default(&log_cfg);
-        log_cfg.console_level = 4; 
+        log_cfg.console_level = 4;
         status = pjsua_init(&cfg, &log_cfg, NULL);
         if (status != PJ_SUCCESS) error_exit("Error in pjsua_init()", status);
     }
     /* Add UDP transport. */
     {
-        pjsua_transport_config cfg; 
+        pjsua_transport_config cfg;
         pjsua_transport_config_default(&cfg);
         cfg.port = 5060;
         status = pjsua_transport_create(PJSIP_TRANSPORT_UDP, &cfg, NULL);
