@@ -12,11 +12,13 @@
 #define SIP_USER_3 "996894"
 #define SIP_PASSWD_3 "Pin996894"
 
-#define SND_DEV_IDX_1 8
-#define SND_DEV_IDX_2 12
-#define SND_DEV_IDX_3 16
-#define SND_DEV_IDX_4 20
+#define SND_DEV_IDX_0 8
+#define SND_DEV_IDX_1 12
+#define SND_DEV_IDX_2 16
+#define SND_DEV_IDX_3 20
 
+pj_pool_t *pool;
+pjmedia_port *conf;
 /* Display error and exit application */
 static void error_exit(const char *title, pj_status_t status)
 {
@@ -87,14 +89,149 @@ static void on_call_media_state(pjsua_call_id call_id)
 
     if (ci.media_status == PJSUA_CALL_MEDIA_ACTIVE) {
         if (strcmp(contact_number.ptr, SIP_USER_0) == 0) {
-            // TODO: conncet to sound device
-            printf("================= match contact 0");
+            //PJ_LOG(1, (__FILE__, "=========== Match contact 0\n"));
+            pj_status_t status;
+            pjmedia_port *sc;
+            pjmedia_port* rev;
+            char errmsg[PJ_ERR_MSG_SIZE];
+            int slot;
+
+            //CREATE SOUND PORT
+            pjmedia_snd_port *snd_port;
+                status = pjmedia_snd_port_create(pool, SND_DEV_IDX_0, SND_DEV_IDX_0,
+                PJMEDIA_PIA_SRATE(&conf->info),
+                2 /* stereo */,
+                2 * PJMEDIA_PIA_SPF(&conf->info),
+                PJMEDIA_PIA_BITS(&conf->info),
+                0, &snd_port);
+
+            // Create stereo-mono splitter/combiner
+            status = pjmedia_splitcomb_create(pool, 
+                PJMEDIA_PIA_SRATE(&conf->info),
+                2 /* stereo */,
+                2 * PJMEDIA_PIA_SPF(&conf->info),
+                PJMEDIA_PIA_BITS(&conf->info),
+                0, &sc);
+
+            /* Connect channel0 (left channel?) to conference port slot0 */
+            status = pjmedia_splitcomb_set_channel(sc, 1/* ch0 */,0 /*options*/, conf);
+
+            /* Create reverse channel for channel1 (right channel?)... */
+            status = pjmedia_splitcomb_create_rev_channel(pool, sc, 0, 0, &rev);
+
+            pjsua_conf_add_port(pool, rev, &slot);
+            pjsua_conf_connect(pjsua_call_get_conf_port(call_id), slot);
+            pjsua_conf_connect(slot, pjsua_call_get_conf_port(call_id));
+            pjmedia_snd_port_connect(snd_port, sc);
+
         } else if (strcmp(contact_number.ptr, SIP_USER_1) == 0) {
-            printf("================= match contact 1");
+            //PJ_LOG(1, (__FILE__, "=========== Match contact 1\n"));
+            pj_status_t status;
+            pjmedia_port *sc1;
+            pjmedia_port* rev1;
+            char errmsg[PJ_ERR_MSG_SIZE];
+            int slot1;
+
+            //CREATE SOUND PORT
+            pjmedia_snd_port *snd_port1;
+            status = pjmedia_snd_port_create(pool, SND_DEV_IDX_1, SND_DEV_IDX_1,
+                PJMEDIA_PIA_SRATE(&conf->info),
+                2 /* stereo */,
+                2 * PJMEDIA_PIA_SPF(&conf->info),
+                PJMEDIA_PIA_BITS(&conf->info),
+                0, &snd_port1);
+            // Create stereo-mono splitter/combiner
+            status = pjmedia_splitcomb_create(pool, 
+                PJMEDIA_PIA_SRATE(&conf->info),
+                2 /* stereo */,
+                2 * PJMEDIA_PIA_SPF(&conf->info),
+                PJMEDIA_PIA_BITS(&conf->info),
+                0, &sc1);
+
+            /* Connect channel0 (left channel?) to conference port slot0 */
+            status = pjmedia_splitcomb_set_channel(sc1, 1/* ch0 */,0 /*options*/, conf);
+            /* Create reverse channel for channel1 (right channel?)... */
+            status = pjmedia_splitcomb_create_rev_channel(pool, sc1, 0, 0, &rev1);
+
+            pjsua_conf_add_port(pool, rev1, &slot1);
+            pjsua_conf_connect(pjsua_call_get_conf_port(call_id), slot1);
+            pjsua_conf_connect(slot1, pjsua_call_get_conf_port(call_id));
+            pjmedia_snd_port_connect(snd_port1, sc1);
+
         } else if (strcmp(contact_number.ptr, SIP_USER_2) == 0) {
-            printf("================= match contact 2");
+            //PJ_LOG(1, (__FILE__, "=========== Match contact 2\n"));
+            pj_status_t status;
+            pjmedia_port *sc2;
+            pjmedia_port* rev2;
+            char errmsg[PJ_ERR_MSG_SIZE];
+            int slot2;
+
+            //CREATE SOUND PORT
+            pjmedia_snd_port *snd_port2;
+            status = pjmedia_snd_port_create(pool, SND_DEV_IDX_2, SND_DEV_IDX_2,
+                PJMEDIA_PIA_SRATE(&conf->info),
+                2 /* stereo */,
+                2 * PJMEDIA_PIA_SPF(&conf->info),
+                PJMEDIA_PIA_BITS(&conf->info),
+                0, &snd_port2);
+            if (status != PJ_SUCCESS) error_exit("Error pjmedia_snd_port_create \n", status);
+            // Create stereo-mono splitter/combiner
+            status = pjmedia_splitcomb_create(pool, 
+                PJMEDIA_PIA_SRATE(&conf->info),
+                2 /* stereo */,
+                2 * PJMEDIA_PIA_SPF(&conf->info),
+                PJMEDIA_PIA_BITS(&conf->info),
+                0, &sc2);
+
+            if (status != PJ_SUCCESS) error_exit("Error pjmedia_splitcomb_create \n", status);
+            /* Connect channel0 (left channel?) to conference port slot0 */
+            status = pjmedia_splitcomb_set_channel(sc2, 1/* ch0 */,0 /*options*/, conf);
+            if (status != PJ_SUCCESS) error_exit("Error pjmedia_splitcomb_set_channel \n", status);
+            /* Create reverse channel for channel1 (right channel?)... */
+            status = pjmedia_splitcomb_create_rev_channel(pool, sc2, 0, 0, &rev2);
+            if (status != PJ_SUCCESS) error_exit("Error pjmedia_splitcomb_create_rev_channel\n", status);
+            pjsua_conf_add_port(pool, rev2, &slot2);
+            pjsua_conf_connect(pjsua_call_get_conf_port(call_id), slot2);
+            pjsua_conf_connect(slot2, pjsua_call_get_conf_port(call_id));
+            pjmedia_snd_port_connect(snd_port2, sc2);
+
         } else if (strcmp(contact_number.ptr, SIP_USER_3) == 0) {
-            printf("================= match contact 3");
+            //PJ_LOG(1, (__FILE__, "=========== Match contact 3\n"));
+            pj_status_t status;
+            pjmedia_port *sc3;
+            pjmedia_port* rev3;
+            char errmsg[PJ_ERR_MSG_SIZE];
+            int slot3;
+
+            //CREATE SOUND PORT
+            pjmedia_snd_port *snd_port3;
+            status = pjmedia_snd_port_create(pool, SND_DEV_IDX_3, SND_DEV_IDX_3,
+                PJMEDIA_PIA_SRATE(&conf->info),
+                2 /* stereo */,
+                2 * PJMEDIA_PIA_SPF(&conf->info),
+                PJMEDIA_PIA_BITS(&conf->info),
+                0, &snd_port3);
+
+            // Create stereo-mono splitter/combiner
+            status = pjmedia_splitcomb_create(pool, 
+                PJMEDIA_PIA_SRATE(&conf->info),
+                2 /* stereo */,
+                2 * PJMEDIA_PIA_SPF(&conf->info),
+                PJMEDIA_PIA_BITS(&conf->info),
+                0, &sc3);
+
+            /* Connect channel0 (left channel?) to conference port slot0 */
+            status = pjmedia_splitcomb_set_channel(sc3, 1/* ch0 */,0 /*options*/, conf);
+            /* Create reverse channel for channel1 (right channel?)... */
+            status = pjmedia_splitcomb_create_rev_channel(pool, sc3, 0, 0, &rev3);
+
+            pjsua_conf_add_port(pool, rev3, &slot3);
+            pjsua_conf_connect(pjsua_call_get_conf_port(call_id), slot3);
+            pjsua_conf_connect(slot3, pjsua_call_get_conf_port(call_id));
+            pjmedia_snd_port_connect(snd_port3, sc3);
+
+        } else {
+            PJ_LOG(1, (__FILE__, "=========== Match no contact \n"));
         }
     }
 }
@@ -130,6 +267,12 @@ int main(int argc, char *argv[])
     }
     /* Initialization is done, now start pjsua */
     status = pjsua_start();
+
+    /* Create Pool*/
+    pool = pjsua_pool_create("pool", 512, 512);
+
+    /* Create conf*/
+    conf = pjsua_set_no_snd_dev();
 
     /* Register to SIP server by creating SIP account. */
     {
