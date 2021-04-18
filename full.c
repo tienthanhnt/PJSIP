@@ -71,6 +71,16 @@ struct config ar_config[24];
         pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[1].slot);
         pjsua_conf_connect(ar_config[1].slot, pjsua_call_get_conf_port(call_id));
 	  }
+	  else if (strcmp(a.ptr, ar_config[2].username) == 0) {
+        printf("===========================match phone 3\n");
+        pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[2].slot);
+        pjsua_conf_connect(ar_config[2].slot, pjsua_call_get_conf_port(call_id));
+	  }
+	  else if (strcmp(a.ptr, ar_config[3].username) == 0) {
+        printf("===========================match phone 4\n");
+        pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[3].slot);
+        pjsua_conf_connect(ar_config[3].slot, pjsua_call_get_conf_port(call_id));
+	  }
   	}
  }
  /* Display error and exit application */
@@ -136,7 +146,7 @@ struct config ar_config[24];
   /* Create conf*/
   conf = pjsua_set_no_snd_dev();
 
-  for (i = 0; i < 1; i++){
+  for (i = 0; i < 2; i++){
         printf("init sound device %d", i);
         status = pjmedia_snd_port_create(pool, ar_config[i].playback_dev_id, ar_config[i].capture_dev_id, 
                 PJMEDIA_PIA_SRATE(&conf->info),
@@ -190,7 +200,7 @@ struct config ar_config[24];
         pjsua_conf_add_port(pool, ar_config[i].rev, &ar_config[i].slot);
         pjmedia_snd_port_connect(ar_config[i].snd_port, ar_config[i].sc);
   }
-  for(i = 0; i < 1; i++){
+  for(i = 0; i < 2; i++){
         pjsua_acc_config cfg;
         pjsua_acc_config_default(&cfg);
         char id[100];
@@ -221,8 +231,12 @@ struct config ar_config[24];
   if (option[0] == 'q')
   break;
   if (option[0] == 'm'){
-    pj_str_t uri1 = pj_str("sip:996892@192.168.1.50");
+    pj_str_t uri1 = pj_str("sip:522601@192.168.1.198");
     status = pjsua_call_make_call(ar_config[0].acc_id, &uri1, 0, NULL, NULL, NULL);
+  }
+  if (option[0] == 'p'){
+    pj_str_t uri1 = pj_str("sip:522602@192.168.1.198");
+    status = pjsua_call_make_call(ar_config[1].acc_id, &uri1, 0, NULL, NULL, NULL);
   }
  
   if (option[0] == 'h')
