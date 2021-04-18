@@ -38,8 +38,8 @@ video_adaptive_jitt_comp_enabled=1
 local_ring=/home/ata/runlp/958250/incoming_chat.wav
 remote_ring=/home/ata/runlp/958250/toy-mono.wav
 ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=ALSA: USB Audio Device 1
-capture_dev_id=ALSA: USB Audio Device 1
+playback_dev_id=14
+capture_dev_id=14
 playback_gain_db=0.000000
 mic_gain_db=0.000000
 
@@ -219,10 +219,11 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=sang
+username=996891
+secret=pin996891
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
-domain=192.168.1.254
+domain=192.168.1.50
 algorithm=MD5
 #account1
 [net]
@@ -263,9 +264,9 @@ video_adaptive_jitt_comp_enabled=1
 [sound]
 local_ring=/home/ata/runlp/958250/incoming_chat.wav
 remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=ALSA: USB Audio Device 1
-capture_dev_id=ALSA: USB Audio Device 1
+ringer_dev_id=27aaaaaa
+playback_dev_id=27
+capture_dev_id=27
 playback_gain_db=0.000000
 mic_gain_db=0.000000
 
@@ -445,10 +446,11 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996893
+secret=123456
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
-domain=192.168.1.254
+domain=192.168.1.50
 algorithm=MD5
 
 #account2
@@ -672,7 +674,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996893
+secret=pin996893
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -899,7 +902,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996894
+secret=pin996894
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -1125,7 +1129,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996896
+secret=pin996896
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -1352,7 +1357,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996990
+secret=pin996990
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -1578,7 +1584,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996991
+secret=pin996991
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -1804,7 +1811,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996992
+secret=pin996992
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -2030,7 +2038,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996993
+secret=pin996993
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -2256,7 +2265,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996994
+secret=pin996994
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -2482,7 +2492,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996996
+secret=pin996996
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -2708,7 +2719,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996997
+secret=pin996997
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -2934,7 +2946,8 @@ reg_identity=sip:958250@192.168.1.254
 ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
-username=958250
+username=996998
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -3161,6 +3174,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -3387,6 +3401,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -3613,6 +3628,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -3839,6 +3855,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -4065,6 +4082,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -4291,6 +4309,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -4517,6 +4536,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -4743,6 +4763,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -4969,6 +4990,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -5195,6 +5217,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254
@@ -5421,6 +5444,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=958250
+secret=pin996998
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.254

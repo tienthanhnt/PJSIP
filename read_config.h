@@ -1,3 +1,4 @@
+#include <pjsua-lib/pjsua.h>
 struct config{
   /* sip */
     char contact[100];
@@ -12,8 +13,8 @@ struct config{
     int text_rtp_port;
     /* sound */
     char ringer_dev_id[100];
-    char playback_dev_id[100];
-    char capture_dev_id[100];
+    int playback_dev_id;
+    int capture_dev_id;
     float playback_gain_db;
     float mic_gain_db;
     /* proxy */
@@ -25,6 +26,12 @@ struct config{
     char ha1[100];
     char realm[100];
     char domain[100];
+    pjmedia_port *sc;
+    pjmedia_port* rev;
+    int slot;
+    pjmedia_snd_port *snd_port;
+    pjsua_acc_id acc_id;
+
 };
 void del_line(char *src);
 int find(char *src, char *key);

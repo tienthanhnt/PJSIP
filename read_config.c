@@ -46,11 +46,11 @@ void read_config(struct config *ar_config, char *dir)
     index = find(str_line, "=");
     if (index != -1){
       char *key = trim(str_line,0,index);
-      char *value = trim(str_line, index + 1, strlen(str_line));
+      char *value = trim(str_line, index + 1, strlen(str_line)-1);
       if (strcmp(key, "contact") == 0){
         strcpy(ar_config[count].contact, trim(str_line,index+1,find(str_line,";transport")));
         //printf("%s ",ar_config[count].contact);
-        del_line(ar_config[count].contact);
+        //del_line(ar_config[count].contact);
       }
       else if (strcmp(key, "sip_port") == 0){
         ar_config[count].sip_port = atoi(value);
@@ -68,19 +68,27 @@ void read_config(struct config *ar_config, char *dir)
         ar_config[count].inc_timeout = atoi(value);
         //printf("%d \n",ar_config[count].inc_timeout);
       }
+      else if (strcmp(key, "playback_dev_id") == 0){
+        ar_config[count].playback_dev_id = atoi(value);
+        printf("%d \n",ar_config[count].playback_dev_id);
+      }
+      else if (strcmp(key, "capture_dev_id") == 0){
+        ar_config[count].capture_dev_id = atoi(value);
+        printf("%d \n",ar_config[count].capture_dev_id);
+      }
       else if (strcmp(key, "domain") == 0){
         strcpy(ar_config[count].domain, value);
-        del_line(ar_config[count].domain);
+        //del_line(ar_config[count].domain);
         printf("%s \n",ar_config[count].domain);
       }
       else if (strcmp(key, "username") == 0){
         strcpy(ar_config[count].username, value);
-        del_line(ar_config[count].username);
+        //del_line(ar_config[count].username);
         printf("%s \n",ar_config[count].username);
       }
       else if (strcmp(key, "secret") == 0){
         strcpy(ar_config[count].secret, value);
-        del_line(ar_config[count].secret);
+        //del_line(ar_config[count].secret);
         printf("%s \n",ar_config[count].secret);
       }
     }
