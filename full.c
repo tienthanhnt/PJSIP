@@ -8,6 +8,12 @@
 
 pj_pool_t *pool;
 pjmedia_port *conf;
+pj_str_t cat_chuoi(char *src){
+  pj_str_t val;
+  char *temp;
+  temp = trim(src, find(src, ":") + 1, find(src, "@"));
+  val = pj_str(temp);
+}
 struct config ar_config[24];
  /* Callback called by the library upon receiving incoming call */
  static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
@@ -49,7 +55,7 @@ struct config ar_config[24];
   printf("=================pjsua_acc_id = %d \n", ci.acc_id);
   printf("=================local_contact = %s \n",ci.local_contact.ptr);
   printf("=================remote_contact = %s \n", ci.remote_contact.ptr);
-  a = pj_str(cat_chuoi(ci.local_contact.ptr));
+  a = cat_chuoi(ci.local_contact.ptr);
   printf("=========================a = %s\n", a.ptr);
   printf("=========================mediacnt = %d\n",ci.media_cnt);
 
@@ -130,7 +136,8 @@ struct config ar_config[24];
   /* Create conf*/
   conf = pjsua_set_no_snd_dev();
 
-  for (i = 0; i < 2; i++){
+  for (i = 0; i < 1; i++){
+        printf("init sound device %d", i);
         status = pjmedia_snd_port_create(pool, ar_config[i].playback_dev_id, ar_config[i].capture_dev_id, 
                 PJMEDIA_PIA_SRATE(&conf->info),
                 2 /* stereo */,
@@ -183,11 +190,11 @@ struct config ar_config[24];
         pjsua_conf_add_port(pool, ar_config[i].rev, &ar_config[i].slot);
         pjmedia_snd_port_connect(ar_config[i].snd_port, ar_config[i].sc);
   }
-  for(i = 0; i < 2; i++){
+  for(i = 0; i < 1; i++){
         pjsua_acc_config cfg;
         pjsua_acc_config_default(&cfg);
         char id[100];
-        char reg_uri[100] = "sip:";
+        char reg_uri[100];
         sprintf(id,"sip:%s@%s", ar_config[i].username, ar_config[i].domain);
         cfg.id = pj_str(id);
         sprintf(reg_uri, "sip:%s", ar_config[i].domain);
@@ -198,13 +205,14 @@ struct config ar_config[24];
         cfg.cred_info[0].username = pj_str(ar_config[i].username);
         cfg.cred_info[0].data_type = PJSIP_CRED_DATA_PLAIN_PASSWD;
         cfg.cred_info[0].data = pj_str(ar_config[i].secret);
-        status = pjsua_acc_add(&cfg, PJ_TRUE, &ar_config->acc_id);
+        printf ("id : %s, reg_uri : %s, secret : %s \n",cfg.id.ptr,cfg.reg_uri.ptr,cfg.cred_info[0].data.ptr);
+        status = pjsua_acc_add(&cfg, PJ_TRUE, &ar_config[i].acc_id);
         if (status != PJ_SUCCESS) error_exit("Error adding account 0", status);
   }
   for (;;) {
   char option[10];
  
-  puts("Press 'h' to hangup all calls, 'q' to quit");
+  puts("Press 'h' to hangup all calls,'m' to make a call, 'q' to quit");
   if (fgets(option, sizeof(option), stdin) == NULL) {
   puts("EOF while reading stdin, will quit now..");
   break;
@@ -212,7 +220,12 @@ struct config ar_config[24];
  
   if (option[0] == 'q')
   break;
+  if (option[0] == 'm'){
+    pj_str_t uri1 = pj_str("sip:996892@192.168.1.50");
+    status = pjsua_call_make_call(ar_config[0].acc_id, &uri1, 0, NULL, NULL, NULL);
+  }
  
   if (option[0] == 'h')
   pjsua_call_hangup_all();
  }
+}

@@ -38,8 +38,8 @@ video_adaptive_jitt_comp_enabled=1
 local_ring=/home/ata/runlp/958250/incoming_chat.wav
 remote_ring=/home/ata/runlp/958250/toy-mono.wav
 ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=14
-capture_dev_id=14
+playback_dev_id=24
+capture_dev_id=24
 playback_gain_db=0.000000
 mic_gain_db=0.000000
 
@@ -220,7 +220,7 @@ ref=tCSLLiUYLmbfDrW
 
 [auth_info_0]
 username=996891
-secret=pin996891
+secret=Pin996891
 ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.50
@@ -265,8 +265,8 @@ video_adaptive_jitt_comp_enabled=1
 local_ring=/home/ata/runlp/958250/incoming_chat.wav
 remote_ring=/home/ata/runlp/958250/toy-mono.wav
 ringer_dev_id=27aaaaaa
-playback_dev_id=27
-capture_dev_id=27
+playback_dev_id=25
+capture_dev_id=25
 playback_gain_db=0.000000
 mic_gain_db=0.000000
 

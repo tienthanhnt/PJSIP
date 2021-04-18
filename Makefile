@@ -2,7 +2,7 @@
 # this is the line you will need to build the binary.
 all: myapp
 
-myapp: myapp.c
+myapp: full.c
 	$(CC) -o $@ read_config.c $< `pkg-config --cflags --libs libpjproject`
 
 clean:
