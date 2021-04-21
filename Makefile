@@ -1,9 +1,9 @@
 # If your application is in a file named myapp.cpp or myapp.c
 # this is the line you will need to build the binary.
-all: myapp
+all: app
 
-myapp: main.c
+app: main.c
 	$(CC) -o $@ read_config.c $< `pkg-config --cflags --libs libpjproject`
 
 clean:
-	rm -f myapp.o myapp
+	rm -f app.o app
