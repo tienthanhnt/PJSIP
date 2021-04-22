@@ -102,14 +102,18 @@ int main(int argc, char *argv[])
 	{
 		pjsua_config cfg;
 		pjsua_logging_config log_cfg;
-		//pjsua_media_config   media_cfg;
-		//pjsua_media_config_default(&media_cfg);
-		//media_cfg.channel_count=2;
+
+		// config pj_media
+		pjsua_media_config   media_cfg;
+		pjsua_media_config_default(&media_cfg);
+		media_cfg.no_vad = PJ_TRUE;
+		media_cfg.quality = 10;
 
 		pjsua_config_default(&cfg);
 		cfg.cb.on_incoming_call = &on_incoming_call;
 		cfg.cb.on_call_media_state = &on_call_media_state;
 		cfg.cb.on_call_state = &on_call_state;
+		cfg.max_calls = 32;
 
 		pjsua_logging_config_default(&log_cfg);
 		log_cfg.console_level = 4;
@@ -119,14 +123,18 @@ int main(int argc, char *argv[])
 	}
 
 	/* Add UDP transport. */
-	{
-		pjsua_transport_config cfg;
+	pjsua_transport_id cfg_transport_id[2];
+	pjsua_transport_config cfg_transport[2];
 
-		pjsua_transport_config_default(&cfg);
-		cfg.port = 5060;
-		status = pjsua_transport_create(PJSIP_TRANSPORT_UDP, &cfg, NULL);
-		if (status != PJ_SUCCESS) error_exit("Error creating transport", status);
-	}
+	pjsua_transport_config_default(&cfg_transport[0]);
+	cfg_transport[0].port = 5060;
+	status = pjsua_transport_create(PJSIP_TRANSPORT_UDP, &cfg_transport[0], &cfg_transport_id[0]);
+	if (status != PJ_SUCCESS) error_exit("Error creating transport", status);
+
+	pjsua_transport_config_default(&cfg_transport[1]);
+	cfg_transport[1].port = 5061;
+	status = pjsua_transport_create(PJSIP_TRANSPORT_UDP, &cfg_transport[1], &cfg_transport_id[1]);
+	if (status != PJ_SUCCESS) error_exit("Error creating transport", status);
 
 	/* Initialization is done, now start pjsua */
 	status = pjsua_start();
@@ -142,14 +150,11 @@ int main(int argc, char *argv[])
 				2 * PJMEDIA_PIA_SPF(&conf->info),
 				PJMEDIA_PIA_BITS(&conf->info),
 				0, &ar_config[i].snd_port);
-		if (status != PJ_SUCCESS) {
-			pj_strerror(status, errmsg, sizeof(errmsg));
-			PJ_LOG(1, (__FILE__, "Status %d: %s\n", status, errmsg));
-			return ;
-		}
-		else {
-			PJ_LOG(1, (__FILE__, "pjmedia_snd_port_create...OK"));
-		}
+		printf("=======================> pjmedia_port clock rate = %d", PJMEDIA_PIA_SRATE(&conf->info));
+		printf("=======================> pjmedia_port sample per frame = %d", PJMEDIA_PIA_SPF(&conf->info));
+		printf("=======================> pjmedia_port number bit per sample = %d", PJMEDIA_PIA_BITS(&conf->info));
+
+		pjmedia_snd_port_set_ec(ar_config[i].snd_port, pool, 200, PJMEDIA_ECHO_SIMPLE);
 		// Create stereo-mono splitter/combiner
 		status = pjmedia_splitcomb_create(pool, 
 				PJMEDIA_PIA_SRATE(&conf->info),
@@ -157,34 +162,13 @@ int main(int argc, char *argv[])
 				2 * PJMEDIA_PIA_SPF(&conf->info),
 				PJMEDIA_PIA_BITS(&conf->info),
 				0, &ar_config[i].sc);
-		if (status != PJ_SUCCESS) {
-			pj_strerror(status, errmsg, sizeof(errmsg));
-			PJ_LOG(1, (__FILE__, "Status %d: %s\n", status, errmsg));
-			return ;
-		}
-		else {
-			PJ_LOG(1, (__FILE__, "pjmedia_splitcomb_create OK"));
-		}
+
 		/* Connect channel0 (left channel?) to conference port slot0 */
 		status = pjmedia_splitcomb_set_channel(ar_config[i].sc, 1/* ch0 */,0 /*options*/, conf);
-		if (status != PJ_SUCCESS) {
-			pj_strerror(status, errmsg, sizeof(errmsg));
-			PJ_LOG(1, (__FILE__, "Status %d: %s\n", status, errmsg));
-			return 0;
-		}
-		else {
-			PJ_LOG(1, (__FILE__, "pjmedia_splitcomb_set_channel OK"));
-		}
+
 		/* Create reverse channel for channel1 (right channel?)... */
 		status = pjmedia_splitcomb_create_rev_channel(pool, ar_config[i].sc, 0, 0, &ar_config[i].rev);
-		if (status != PJ_SUCCESS) {
-			pj_strerror(status, errmsg, sizeof(errmsg));
-			PJ_LOG(1, (__FILE__, "Status %d: %s\n", status, errmsg));
-			return 0;
-		}
-		else {
-			PJ_LOG(1, (__FILE__, "pjmedia_splitcomb_create_rev_channel...OK"));
-		}
+
 		pjsua_conf_add_port(pool, ar_config[i].rev, &ar_config[i].slot);
 		pjmedia_snd_port_connect(ar_config[i].snd_port, ar_config[i].sc);
 	}
@@ -195,6 +179,7 @@ int main(int argc, char *argv[])
 		char reg_uri[100];
 		sprintf(id,"sip:%s@%s", ar_config[i].username, ar_config[i].domain);
 		cfg.id = pj_str(id);
+		cfg.transport_id = cfg_transport_id[i]; /* Map account to a config which has difference SIP port*/
 		sprintf(reg_uri, "sip:%s", ar_config[i].domain);
 		cfg.reg_uri = pj_str(reg_uri);
 		cfg.cred_count = 1;
@@ -206,6 +191,9 @@ int main(int argc, char *argv[])
 		printf ("id : %s, reg_uri : %s, secret : %s \n",cfg.id.ptr,cfg.reg_uri.ptr,cfg.cred_info[0].data.ptr);
 		status = pjsua_acc_add(&cfg, PJ_TRUE, &ar_config[i].acc_id);
 		if (status != PJ_SUCCESS) error_exit("Error adding account 0", status);
+		//status = pjsua_acc_set_transport(cfg, cfg_transport_id[i]);
+		//if (status != PJ_SUCCESS) error_exit("Error set transpoet ID", status);
+
 	}
 	for (;;) {
 		char option[10];
