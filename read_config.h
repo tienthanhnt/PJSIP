@@ -26,12 +26,17 @@ struct config{
 	char ha1[100];
 	char realm[100];
 	char domain[100];
-	pjmedia_port *sc;
+	pjmedia_port *sc, *sc_2;
 	pjmedia_port* rev;
-	int slot;
+	pjmedia_port* rev_1;
+	int slot, slot_1;
 	pjmedia_snd_port *snd_port;
 	pjsua_acc_id acc_id;
-
+	/* add pjmedia conf */
+	pjmedia_conf *media_conf, *media_conf_2;
+	pjmedia_port *mp, *mp_2;
+	int p_slot;
+	
 };
 void del_line(char *src);
 int find(char *src, char *key);

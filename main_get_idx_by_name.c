@@ -4,12 +4,8 @@
 #include <string.h>
 #include "read_config.h"
 
-//#define 	PJMEDIA_SND_DEFAULT_REC_LATENCY   1000
-//#define 	PJMEDIA_SND_DEFAULT_PLAY_LATENCY   1400
-#define PJSUA_DEFAULT_AUDIO_FRAME_PTIME   2
-
-#define PJSUA_DEFAULT_CLOCK_RATE   32000
-
+#define 	PJMEDIA_SND_DEFAULT_REC_LATENCY   1000
+#define 	PJMEDIA_SND_DEFAULT_PLAY_LATENCY   1400
 
 #define THIS_FILE "APP"
 
@@ -65,15 +61,12 @@ static void on_call_media_state(pjsua_call_id call_id)
 	//When media is active, connect call to sound device.
 	if (ci.media_status == PJSUA_CALL_MEDIA_ACTIVE) {
 		if (strcmp(contact_number.ptr, ar_config[0].username) == 0) {
-			//pjmedia_snd_port_connect(ar_config[0].snd_port, ar_config[0].sc);
-			//pjsua_conf_add_port(pool, ar_config[0].rev, &ar_config[0].slot);
-			pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[0].slot);
-			pjsua_conf_connect(ar_config[0].slot, pjsua_call_get_conf_port(call_id));
+			pjsua_conf_connect(ci.conf_slot, ar_config[0].slot);
+			pjsua_conf_connect(ar_config[0].slot, ci.conf_slot);
 			//pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[0].slot_1);
 			//pjsua_conf_connect(ar_config[0].slot_1, pjsua_call_get_conf_port(call_id));
 		}
 		else if (strcmp(contact_number.ptr, ar_config[1].username) == 0) {
-			//pjsua_conf_add_port(pool, ar_config[1].rev, &ar_config[1].slot);
 			pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[1].slot);
 			pjsua_conf_connect(ar_config[1].slot, pjsua_call_get_conf_port(call_id));
 			//pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[1].slot_1);
@@ -122,12 +115,24 @@ int main(int argc, char *argv[])
 		pjsua_media_config_default(&media_cfg);
 		//media_cfg.no_vad = PJ_TRUE;
 		media_cfg.quality = 10;
+		media_cfg.clock_rate = 48000;
+		media_cfg.audio_frame_ptime = 20;
+		media_cfg.channel_count = 2;
+		media_cfg.ec_options = PJMEDIA_ECHO_USE_SW_ECHO;
 
 		pjsua_config_default(&cfg);
 		cfg.cb.on_incoming_call = &on_incoming_call;
 		cfg.cb.on_call_media_state = &on_call_media_state;
 		cfg.cb.on_call_state = &on_call_state;
 		cfg.max_calls = 32;
+		pj_str_t codec_id;
+		//codec_id = pj_str((char*)"");
+		//codec_id = pj_str((char*)"G729/8000/1");;
+		//status = pjsua_codec_set_priority(&codec_id, PJMEDIA_CODEC_PRIO_HIGHEST);
+		//if (status != PJ_SUCCESS) printf("=============== set codec failed");
+		//pjmedia_endpt endpt;`
+		//pjmedia_codec_param param;
+
 		pjsua_logging_config_default(&log_cfg);
 		log_cfg.console_level = 4;
 
@@ -154,27 +159,50 @@ int main(int argc, char *argv[])
 
 	pool = pjsua_pool_create("pool", 2048, 2048);
 	conf = pjsua_set_no_snd_dev();
+	char devAudioName_0[30];
+	char devAudioName_1[30];
+	char drvName[5];
+	pj_ansi_strcpy(devAudioName_0, "sysdefault:CARD=Device");
+	pj_ansi_strcpy(devAudioName_1, "sysdefault:CARD=Device_1");
+	pj_ansi_strcpy(drvName, "alsa");
 
-	for (i = 0; i < 2; i++){
+	for (int i = 0; i < 2; i++){
 		printf("init sound device %d", i);
-		status = pjmedia_snd_port_create(pool, ar_config[i].playback_dev_id, ar_config[i].capture_dev_id, 
-				PJMEDIA_PIA_SRATE(&conf->info),
+		ar_config[i].snd_port = NULL;
+		switch (i) {
+			case 0:
+				printf("====================== case i = %d \n", i);
+				pj_ansi_strcpy(ar_config[i].devName, "sysdefault:CARD=Device");
+				break;
+			case 1:
+				printf("====================== case i = %d \n", i);
+				pj_ansi_strcpy(ar_config[i].devName, "sysdefault:CARD=Device_1");
+				break;
+			default:
+				printf("======================= no match \n");	
+		}
+
+		pjmedia_aud_dev_lookup(drvName, ar_config[i].devName, &ar_config[i].playback_dev_id);
+		printf("=================================== index = %d\n", ar_config[i].playback_dev_id);
+
+		status = pjmedia_snd_port_create(pool, ar_config[i].playback_dev_id, ar_config[i].playback_dev_id, 
+				16000,
 				2 /* stereo */,
-				2 * PJMEDIA_PIA_SPF(&conf->info),
-				PJMEDIA_PIA_BITS(&conf->info),
+				2 * 320,
+				16,
 				0, &ar_config[i].snd_port);
 
 		pjmedia_snd_port_set_ec(ar_config[i].snd_port, pool, 300, PJMEDIA_ECHO_SIMPLE);
 		// Create stereo-mono splitter/combiner
 		status = pjmedia_splitcomb_create(pool, 
-				PJMEDIA_PIA_SRATE(&conf->info),
+				16000,
 				2 /* stereo */,
-				2 * PJMEDIA_PIA_SPF(&conf->info),
-				PJMEDIA_PIA_BITS(&conf->info),
+				2 * 320,
+				16,
 				0, &ar_config[i].sc);
-		printf("=======================> pjmedia_port clock rate = %d \n", PJMEDIA_PIA_SRATE(&conf->info));
-		printf("=======================> pjmedia_port sample per frame = %d \n", PJMEDIA_PIA_SPF(&conf->info));
-		printf("=======================> pjmedia_port number bit per sample = %d \n", PJMEDIA_PIA_BITS(&conf->info));
+//		printf("=======================> pjmedia_port clock rate = %d \n", PJMEDIA_PIA_SRATE(&conf->info));
+//		printf("=======================> pjmedia_port sample per frame = %d \n", PJMEDIA_PIA_SPF(&conf->info));
+//		printf("=======================> pjmedia_port number bit per sample = %d \n", PJMEDIA_PIA_BITS(&conf->info));
 
 		/* Connect channel0 (left channel?) to conference port slot0 */
 		status = pjmedia_splitcomb_set_channel(ar_config[i].sc, 0, 0, conf);
@@ -185,13 +213,10 @@ int main(int argc, char *argv[])
 		//status = pjmedia_splitcomb_set_channel(ar_config[i].sc, 1, 0, conf);
 		//status = pjmedia_splitcomb_create_rev_channel(pool, ar_config[i].sc, 0, 0, &ar_config[i].rev_1);
 
-		
+		pjsua_conf_add_port(pool, ar_config[i].rev, &ar_config[i].slot);
+		printf("===================================== slot = %d", ar_config[i].slot);
 		//pjsua_conf_add_port(pool, ar_config[i].rev_1, &ar_config[i].slot_1);
 		pjmedia_snd_port_connect(ar_config[i].snd_port, ar_config[i].sc);
-		pjsua_conf_add_port(pool, ar_config[i].rev, &ar_config[i].slot);
-		int j;
-		j = pjsua_conf_get_max_ports();
-		printf("==================================== %d\n", j);
 
 		/* Create pjmedia conf and add to pjsua */
 		/*pjmedia_conf_create(pool, 3, PJMEDIA_PIA_SRATE(&conf->info),
@@ -253,17 +278,17 @@ int main(int argc, char *argv[])
 		if (option[0] == 'q')
 			break;
 		if (option[0] == 'm'){
-			pj_str_t uri1 = pj_str("sip:522601@192.168.1.198");
+			pj_str_t uri1 = pj_str("sip:958253@86.10.86.181");
 			status = pjsua_call_make_call(ar_config[0].acc_id, &uri1, 0, NULL, NULL, NULL);
 		}
 		if (option[0] == 'p'){
-			pj_str_t uri1 = pj_str("sip:522602@192.168.1.198");
+			pj_str_t uri1 = pj_str("sip:958254@86.10.86.181");
 			status = pjsua_call_make_call(ar_config[1].acc_id, &uri1, 0, NULL, NULL, NULL);
 		}
-        if (option[0] == 'n'){
-                pj_str_t uri1 = pj_str("sip:996892@192.168.1.198");
-                status = pjsua_call_make_call(ar_config[0].acc_id, &uri1, 0, NULL, NULL, NULL);
-        }
+		if (option[0] == 'o'){
+			pj_str_t uri1 = pj_str("sip:996893@192.168.1.198");
+			status = pjsua_call_make_call(ar_config[0].acc_id, &uri1, 0, NULL, NULL, NULL);
+		}
 		if (option[0] == 'h')
 			pjsua_call_hangup_all();
 	}
