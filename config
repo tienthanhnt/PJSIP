@@ -1,215 +1,51 @@
 #account0
 [sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
 playback_dev_id=6
 capture_dev_id=6
-playback_gain_db=0.000000
-mic_gain_db=0.000000
 
 [auth_info_0]
 username=996891
 secret=Pin996891
-ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.198
 algorithm=MD5
+sip_port=5060
 
 #account1
 [sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=27aaaaaa
 playback_dev_id=10
 capture_dev_id=10
-playback_gain_db=0.000000
-mic_gain_db=0.000000
 
 [auth_info_0]
-username=996893
-secret=Pin996893
-ha1=41c1c967ef776c27370bf1b5646b78cb
+username=996892
+secret=Pin996892
 realm=asterisk
 domain=192.168.1.198
 algorithm=MD5
+sip_port=5062
 
 #account2
 [sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
 playback_dev_id=16
 capture_dev_id=16
-playback_gain_db=0.000000
-mic_gain_db=0.000000
 
 [auth_info_0]
 username=996894
 secret=Pin996894
-ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.198
 algorithm=MD5
+sip_port=5060
 
 #account3
 [sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
 playback_dev_id=20
 capture_dev_id=20
-playback_gain_db=0.000000
-mic_gain_db=0.000000
 
 [auth_info_0]
 username=996896
 secret=Pin996896
-ha1=41c1c967ef776c27370bf1b5646b78cb
 realm=asterisk
 domain=192.168.1.198
 algorithm=MD5
-
-#account4
-[sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=ALSA: USB Audio Device 1
-capture_dev_id=ALSA: USB Audio Device 1
-playback_gain_db=0.000000
-mic_gain_db=0.000000
-
-[auth_info_0]
-username=996896
-secret=pin996896
-ha1=41c1c967ef776c27370bf1b5646b78cb
-realm=asterisk
-domain=192.168.1.254
-algorithm=MD5
-
-#account5
-[sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=ALSA: USB Audio Device 1
-capture_dev_id=ALSA: USB Audio Device 1
-playback_gain_db=0.000000
-mic_gain_db=0.000000
-
-[auth_info_0]
-username=996990
-secret=pin996990
-ha1=41c1c967ef776c27370bf1b5646b78cb
-realm=asterisk
-domain=192.168.1.254
-algorithm=MD5
-
-#account6
-[sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=ALSA: USB Audio Device 1
-capture_dev_id=ALSA: USB Audio Device 1
-playback_gain_db=0.000000
-mic_gain_db=0.000000
-
-[auth_info_0]
-username=996991
-secret=pin996991
-ha1=41c1c967ef776c27370bf1b5646b78cb
-realm=asterisk
-domain=192.168.1.254
-algorithm=MD5
-
-#account7
-[sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=ALSA: USB Audio Device 1
-capture_dev_id=ALSA: USB Audio Device 1
-playback_gain_db=0.000000
-mic_gain_db=0.000000
-
-[auth_info_0]
-username=996991
-secret=pin996991
-ha1=41c1c967ef776c27370bf1b5646b78cb
-realm=asterisk
-domain=192.168.1.254
-algorithm=MD5
-
-#account8
-[sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=ALSA: USB Audio Device 1
-capture_dev_id=ALSA: USB Audio Device 1
-playback_gain_db=0.000000
-mic_gain_db=0.000000
-
-[auth_info_0]
-username=996991
-secret=pin996991
-ha1=41c1c967ef776c27370bf1b5646b78cb
-realm=asterisk
-domain=192.168.1.254
-algorithm=MD5
-
-#account9
-[sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=ALSA: USB Audio Device 1
-capture_dev_id=ALSA: USB Audio Device 1
-playback_gain_db=0.000000
-mic_gain_db=0.000000
-
-[auth_info_0]
-username=996991
-secret=pin996991
-ha1=41c1c967ef776c27370bf1b5646b78cb
-realm=asterisk
-domain=192.168.1.254
-algorithm=MD5
-
-#account10
-[sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=ALSA: USB Audio Device 1
-capture_dev_id=ALSA: USB Audio Device 1
-playback_gain_db=0.000000
-mic_gain_db=0.000000
-
-[auth_info_0]
-username=996991
-secret=pin996991
-ha1=41c1c967ef776c27370bf1b5646b78cb
-realm=asterisk
-domain=192.168.1.254
-algorithm=MD5
-
-#account11
-[sound]
-local_ring=/home/ata/runlp/958250/incoming_chat.wav
-remote_ring=/home/ata/runlp/958250/toy-mono.wav
-ringer_dev_id=ALSA: USB Audio Device 1
-playback_dev_id=ALSA: USB Audio Device 1
-capture_dev_id=ALSA: USB Audio Device 1
-playback_gain_db=0.000000
-mic_gain_db=0.000000
-
-[auth_info_0]
-username=996991
-secret=pin996991
-ha1=41c1c967ef776c27370bf1b5646b78cb
-realm=asterisk
-domain=192.168.1.254
-algorithm=MD5
+sip_port=5060

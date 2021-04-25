@@ -70,6 +70,10 @@ void read_config(struct config *ar_config, char *dir)
 				//del_line(ar_config[count].secret);
 				printf("%s \n",ar_config[count].secret);
 			}
+			else if (strcmp(key, "sip_port") == 0){
+				ar_config[count].sip_port = atoi(value);
+				printf("%d \n",ar_config[count].sip_port);				
+			}
 		}
 	}
 }

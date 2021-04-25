@@ -1,7 +1,6 @@
 #include <pjsua-lib/pjsua.h>
 struct config{
 	/* sip */
-	char contact[100];
 	int sip_port;
 	int sip_tcp_port;
 	int sip_tls_port;
@@ -11,15 +10,15 @@ struct config{
 	/* rtp */
 	int audio_rtp_port;
 	int text_rtp_port;
+
 	/* sound */
-	char ringer_dev_id[100];
 	int playback_dev_id;
 	int capture_dev_id;
-	float playback_gain_db;
-	float mic_gain_db;
+
 	/* proxy */
 	char reg_proxy[100];
 	char reg_identity[100];
+
 	/* auth_info */
 	char username[100];
 	char secret[100];
@@ -36,7 +35,7 @@ struct config{
 	pjmedia_conf *media_conf, *media_conf_2;
 	pjmedia_port *mp, *mp_2;
 	int p_slot;
-	
+
 };
 void del_line(char *src);
 int find(char *src, char *key);
