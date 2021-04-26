@@ -90,6 +90,8 @@ int main(int argc, char *argv[])
 	pj_status_t status;
 	int i;
 	char errmsg[PJ_ERR_MSG_SIZE];
+  	pjsua_codec_info codec_inf[100];
+ 	int count = 100;
 
 	read_config(ar_config,"config");
 
@@ -141,6 +143,15 @@ int main(int argc, char *argv[])
 
 	pool = pjsua_pool_create("pool", 2048, 2048);
 	conf = pjsua_set_no_snd_dev();
+
+	// list codec
+ 	status = pjsua_enum_codecs(codec_inf, &count);
+
+	for (int i =0; i<10; i++) {
+	    printf("============================i = %d\n", i);
+	    printf("============================ codec_id 0 = %s\n", codec_inf[i].codec_id.ptr);
+	    printf("============================ codec_pri 0 = %d\n", codec_inf[i].priority);
+	}
 
 	for (i = 0; i < 2; i++){
 		printf("init sound device %d", i);

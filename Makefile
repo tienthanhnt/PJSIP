@@ -3,7 +3,7 @@
 all: app
 
 app: main.c
-	$(CC) -o $@ read_config.c $< `pkg-config --cflags --libs libpjproject`
+	$(CC) -o $@ read_config.c $< `pkg-config --cflags --libs libpjproject` -L/usr/bin/lib -lbcg729
 
 clean:
 	rm -f app.o app
