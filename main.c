@@ -7,6 +7,7 @@
 #define THIS_FILE "APP"
 
 #define USE_CUCM 0
+#define CHANNEL_NUM 2
 
 pj_pool_t *pool;
 pjmedia_port *conf;
@@ -37,6 +38,7 @@ static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
 	/* Automatically answer incoming calls with 200/OK */
 	pjsua_call_answer(call_id, 200, NULL, NULL);
 }
+
 /* Callback called by the library when call's state has changed */
 static void on_call_state(pjsua_call_id call_id, pjsip_event *e)
 {
@@ -49,6 +51,7 @@ static void on_call_state(pjsua_call_id call_id, pjsip_event *e)
 				(int)ci.state_text.slen,
 				ci.state_text.ptr));
 }
+
 /* Callback called by the library when call's media state has changed */
 static void on_call_media_state(pjsua_call_id call_id)
 {
@@ -58,7 +61,6 @@ static void on_call_media_state(pjsua_call_id call_id)
 	pjsua_call_get_info(call_id, &ci);
 	contact_number = get_num_from_call(ci.local_contact.ptr);
 
-	//When media is active, connect call to sound device.
 	if (ci.media_status == PJSUA_CALL_MEDIA_ACTIVE) {
 		if (strcmp(contact_number.ptr, ar_config[0].username) == 0) {
 			pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[0].slot);
@@ -78,6 +80,7 @@ static void on_call_media_state(pjsua_call_id call_id)
 		}									
 	}
 }
+
 /* Display error and exit application */
 static void error_exit(const char *title, pj_status_t status)
 {
@@ -95,7 +98,7 @@ int main(int argc, char *argv[])
 
 	read_config(ar_config,"config");
 
-	// init PJLIB
+	/* init PJLIB */
 	status = pj_init();
 	PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
 
@@ -108,14 +111,12 @@ int main(int argc, char *argv[])
 		pjsua_config cfg;
 		pjsua_logging_config log_cfg;
 
-		// config pj_media
 		pjsua_media_config   media_cfg;
 		pjsua_media_config_default(&media_cfg);
 		media_cfg.quality = 10;
         media_cfg.ec_options = PJMEDIA_ECHO_USE_SW_ECHO;
-        media_cfg.clock_rate = 48000;
-        media_cfg.audio_frame_ptime = 20;
-        media_cfg.channel_count=2;
+        media_cfg.clock_rate = 8000;
+        media_cfg.channel_count = CHANNEL_NUM;
 
 		pjsua_config_default(&cfg);
 		cfg.cb.on_incoming_call = &on_incoming_call;
@@ -132,7 +133,7 @@ int main(int argc, char *argv[])
 	/* Add UDP transport. */
 	pjsua_transport_id cfg_transport_id[24];
 	pjsua_transport_config cfg_transport[24];
-	for(i = 0; i < 2; i++){
+	for(i = 0; i < CHANNEL_NUM; i++){
 		pjsua_transport_config_default(&cfg_transport[i]);
 		cfg_transport[i].port = ar_config[i].sip_port;
 		status = pjsua_transport_create(PJSIP_TRANSPORT_UDP, &cfg_transport[i], &cfg_transport_id[i]);
@@ -144,16 +145,16 @@ int main(int argc, char *argv[])
 	pool = pjsua_pool_create("pool", 2048, 2048);
 	conf = pjsua_set_no_snd_dev();
 
-	// list codec
+	/* list codec */
  	status = pjsua_enum_codecs(codec_inf, &count);
 
-	for (int i =0; i<10; i++) {
+	for (int i = 0; i < 10; i++) {
 	    printf("============================i = %d\n", i);
 	    printf("============================ codec_id 0 = %s\n", codec_inf[i].codec_id.ptr);
 	    printf("============================ codec_pri 0 = %d\n", codec_inf[i].priority);
 	}
 
-	for (i = 0; i < 2; i++){
+	for (i = 0; i < CHANNEL_NUM; i++){
 		printf("init sound device %d", i);
 		status = pjmedia_snd_port_create(pool, ar_config[i].playback_dev_id, ar_config[i].capture_dev_id, 
 				PJMEDIA_PIA_SRATE(&conf->info),
@@ -180,7 +181,8 @@ int main(int argc, char *argv[])
 		pjmedia_snd_port_connect(ar_config[i].snd_port, ar_config[i].sc);
 		pjsua_conf_add_port(pool, ar_config[i].rev, &ar_config[i].slot);
 	}
-	for(i = 0; i < 2; i++){
+
+	for(i = 0; i < CHANNEL_NUM; i++){
 		pjsua_acc_config cfg;
 		pjsua_acc_config_default(&cfg);
 		char id[100];
@@ -188,7 +190,7 @@ int main(int argc, char *argv[])
 		sprintf(id,"sip:%s@%s", ar_config[i].username, ar_config[i].domain);
 		cfg.id = pj_str(id);
 
-		if (USE_CUCM == 0) cfg.transport_id = cfg_transport_id[0]; /* Map account to a config which has difference SIP port*/
+		if (USE_CUCM == 0) cfg.transport_id = cfg_transport_id[0]; /* Map account to a config which has difference SIP port */
 	    else cfg.transport_id = cfg_transport_id[i];
 
 		sprintf(reg_uri, "sip:%s", ar_config[i].domain);
@@ -206,6 +208,7 @@ int main(int argc, char *argv[])
 		//if (status != PJ_SUCCESS) error_exit("Error set transpoet ID", status);
 
 	}
+
 	for (;;) {
 		char option[10];
 
@@ -214,7 +217,6 @@ int main(int argc, char *argv[])
 			puts("EOF while reading stdin, will quit now..");
 			break;
 		}
-
 		if (option[0] == 'q')
 			break;
 		if (option[0] == 'm'){
