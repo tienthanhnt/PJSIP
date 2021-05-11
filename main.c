@@ -114,7 +114,6 @@ int main(int argc, char *argv[])
 
 		pjsua_media_config   media_cfg;
 		pjsua_media_config_default(&media_cfg);
-		media_cfg.quality = 10;
         media_cfg.ec_options = PJMEDIA_ECHO_USE_SW_ECHO;
         media_cfg.clock_rate = 8000;
         media_cfg.channel_count = CHANNEL_NUM;
@@ -123,7 +122,6 @@ int main(int argc, char *argv[])
 		cfg.cb.on_incoming_call = &on_incoming_call;
 		cfg.cb.on_call_media_state = &on_call_media_state;
 		cfg.cb.on_call_state = &on_call_state;
-		cfg.max_calls = 32;
 		pjsua_logging_config_default(&log_cfg);
 		log_cfg.console_level = 4;
 
@@ -145,16 +143,6 @@ int main(int argc, char *argv[])
 
 	pool = pjsua_pool_create("pool", 2048, 2048);
 	conf = pjsua_set_no_snd_dev();
-
-	/* list codec */
- 	status = pjsua_enum_codecs(codec_inf, &count);
-/*
-	for (int i = 0; i < 10; i++) {
-	    printf("============================i = %d\n", i);
-	    printf("============================ codec_id 0 = %s\n", codec_inf[i].codec_id.ptr);
-	    printf("============================ codec_pri 0 = %d\n", codec_inf[i].priority);
-	}
-*/
 
 	for (i = 0; i < CHANNEL_NUM; i++) {
 		printf("init sound device %d \n", i);

@@ -14,7 +14,7 @@ sip_port=5060
 #account1
 [sound]
 sound_id=0
-sound_name=plughw:CARD=SUB01,DEV=0
+sound_name=plughw:CARD=SUB002,DEV=0
 
 [auth_info_0]
 username=996892
@@ -27,7 +27,7 @@ sip_port=5062
 #account2
 [sound]
 sound_id=0
-sound_name=plughw:CARD=SUB02,DEV=0
+sound_name=plughw:CARD=SUB03,DEV=0
 
 [auth_info_0]
 username=996894
@@ -40,7 +40,7 @@ sip_port=5060
 #account3
 [sound]
 sound_id=0
-sound_name=plughw:CARD=SUB03,DEV=0
+sound_name=plughw:CARD=SUB04,DEV=0
 
 [auth_info_0]
 username=996896
