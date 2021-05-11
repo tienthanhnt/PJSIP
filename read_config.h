@@ -12,8 +12,8 @@ struct config{
 	int text_rtp_port;
 
 	/* sound */
-	int playback_dev_id;
-	int capture_dev_id;
+	int sound_id;
+	char sound_name[100];
 
 	/* proxy */
 	char reg_proxy[100];

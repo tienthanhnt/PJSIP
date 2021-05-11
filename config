@@ -1,7 +1,7 @@
 #account0
 [sound]
-playback_dev_id=6
-capture_dev_id=6
+sound_id=0
+sound_name=plughw:CARD=SUB01,DEV=0
 
 [auth_info_0]
 username=996891
@@ -13,8 +13,8 @@ sip_port=5060
 
 #account1
 [sound]
-playback_dev_id=10
-capture_dev_id=10
+sound_id=0
+sound_name=plughw:CARD=SUB01,DEV=0
 
 [auth_info_0]
 username=996892
@@ -26,8 +26,8 @@ sip_port=5062
 
 #account2
 [sound]
-playback_dev_id=16
-capture_dev_id=16
+sound_id=0
+sound_name=plughw:CARD=SUB02,DEV=0
 
 [auth_info_0]
 username=996894
@@ -39,8 +39,8 @@ sip_port=5060
 
 #account3
 [sound]
-playback_dev_id=20
-capture_dev_id=20
+sound_id=0
+sound_name=plughw:CARD=SUB03,DEV=0
 
 [auth_info_0]
 username=996896
