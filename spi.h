@@ -13,8 +13,8 @@
 static const char   *device = "/dev/spidev0.0";
 static uint8_t      mode;
 static uint8_t      bits = 8;
-static uint32_t     speed = 1125000;
-static uint16_t     delay = 2000;
+static uint32_t     speed = 13000;
+static uint16_t     delay = 1000;
 int                 fd1;
 unsigned char       rd_buf[32];
 int                 fd2,ret;

@@ -43,6 +43,7 @@ void read_config(struct config *ar_config, char *dir)
 	}
 	while(fgets(str_line, 300, fptr) != NULL){
 		if (find(str_line, "account") != -1) count++;
+		ar_config[count].call_number = pj_str("idle");
 		index = find(str_line, "=");
 		if (index != -1){
 			char *key = trim(str_line,0,index);

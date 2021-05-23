@@ -40,6 +40,7 @@ static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
         if (ar_config[i].state > 0) goto busy;
         ar_config[i].call_id = call_id;
         ar_config[i].call_number = remote_acc;
+		printf("acount %d , call_number = %s", i, remote_acc.ptr);
         printf("call id %d = %d \n", i, ar_config[i].call_id); 
         ar_config[i].state = 0x02;
         pj_mutex_lock (mutex);
@@ -77,33 +78,34 @@ static void on_call_state(pjsua_call_id call_id, pjsip_event *e)
 {
 	pjsua_call_info ci;
 	pjsua_call_get_info(call_id, &ci);
-  pj_str_t local_acc, remote_acc;
-  int i;
+  	pj_str_t local_acc, remote_acc;
+  	int i;
 	printf("============%s", ci.local_contact.ptr);
 	local_acc = get_num_from_call(ci.local_contact.ptr);
-  remote_acc = get_num_from_call(ci.remote_info.ptr);
+  	remote_acc = get_num_from_call(ci.remote_info.ptr);
 	PJ_UNUSED_ARG(e);
 
 	pjsua_call_get_info(call_id, &ci);
 	PJ_LOG(3,(THIS_FILE, "Call %d state=%.*s", call_id,
 				    (int)ci.state_text.slen,
 				    ci.state_text.ptr));
-  for (i = 0; i < CHANNEL_NUM; i++){
-    if (strcmp(local_acc.ptr, ar_config[i].username) == 0) {
-      if ((ar_config[i].state == 0x02) && (ci.state == 0x06) || (ci.state == 0x04)) goto out;
-      if ((ar_config[i].state != 0) || (ci.state != 0x06)){
-        ar_config[i].call_number = remote_acc;
-        printf("khong phai disconnect %d\n", ar_config[i].state);
-        ar_config[i].state = ci.state;
-        ar_config[i].call_id = call_id;
-        pj_mutex_lock (mutex);
-        transfer(fd1, (uint8_t)((i << 3) | ci.state));
-        pj_mutex_unlock (mutex);
-        break;
-      }
-    }
-  }
-  out :
+	for (i = 0; i < CHANNEL_NUM; i++){
+		if (strcmp(local_acc.ptr, ar_config[i].username) == 0) {
+		if ((ar_config[i].state == 0x02) && (ci.state == 0x06) || (ci.state == 0x04)) goto out;
+		if ((ar_config[i].state != 0) || (ci.state != 0x06)){
+			ar_config[i].call_number = remote_acc;
+			printf("acount %d , call_number = %s", i, remote_acc.ptr);
+			printf("khong phai disconnect %d\n", ar_config[i].state);
+			ar_config[i].state = ci.state;
+			ar_config[i].call_id = call_id;
+			pj_mutex_lock (mutex);
+			transfer(fd1, (uint8_t)((i << 3) | ci.state));
+			pj_mutex_unlock (mutex);
+			break;
+		}
+		}
+	}
+  	out :
         printf(" ");
  }
 /* Callback called by the library when call's media state has changed */
@@ -289,9 +291,12 @@ int main(int argc, char *argv[])
 				if (flag == 0x01) {
 					int i;
 					for (i = 0; i < CHANNEL_NUM; i++){
+						printf("kiem tra lan thu %d \n", i);
+						printf("ar_config[i].call_number.ptr = %s call_number.ptr = %s", ar_config[i].call_number.ptr, "abc");
 						if (strcmp(ar_config[i].call_number.ptr, call_number.ptr) == 0){
-              goto quit;
-              break;
+							printf("hallo\n");
+              				goto quit;
+              				break;
 						}
 					}
 					pjsua_call_make_call(ar_config[count].acc_id, &uri, 0, NULL, NULL, NULL);
@@ -301,7 +306,7 @@ int main(int argc, char *argv[])
 				else if (flag == 0x04) pjsua_call_answer(ar_config[count].call_id, 200, NULL, NULL);
 				else if (flag == 0x07) {
 						ar_config[count].state = 0;
-            ar_config[count].call_number = pj_str("idle");
+            			ar_config[count].call_number = pj_str("idle");
 						pjsua_call_hangup(ar_config[count].call_id, 0, NULL, NULL);
 						printf("idle state\n"); 
 				}
