@@ -1,33 +1,33 @@
 #account0
 [sound]
-sound_id=0
-sound_name=plughw:CARD=SUB01,DEV=0
+playback_dev_id=2
+capture_dev_id=2
 
 [auth_info_0]
 username=996891
 secret=Pin996891
 realm=asterisk
-domain=192.168.1.198
+domain=192.168.1.50
 algorithm=MD5
 sip_port=5060
 
 #account1
 [sound]
-sound_id=0
-sound_name=plughw:CARD=SUB002,DEV=0
+playback_dev_id=3
+capture_dev_id=3
 
 [auth_info_0]
-username=996892
-secret=Pin996892
+username=996893
+secret=123456
 realm=asterisk
-domain=192.168.1.198
+domain=192.168.1.50
 algorithm=MD5
 sip_port=5062
 
 #account2
 [sound]
-sound_id=0
-sound_name=plughw:CARD=SUB03,DEV=0
+playback_dev_id=16
+capture_dev_id=16
 
 [auth_info_0]
 username=996894
@@ -39,8 +39,8 @@ sip_port=5060
 
 #account3
 [sound]
-sound_id=0
-sound_name=plughw:CARD=SUB04,DEV=0
+playback_dev_id=20
+capture_dev_id=20
 
 [auth_info_0]
 username=996896
