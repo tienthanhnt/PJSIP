@@ -12,8 +12,8 @@ struct config{
 	int text_rtp_port;
 
 	/* sound */
-	int sound_id;
-	char sound_name[100];
+	int playback_dev_id;
+	int capture_dev_id;
 
 	/* proxy */
 	char reg_proxy[100];
@@ -25,12 +25,15 @@ struct config{
 	char ha1[100];
 	char realm[100];
 	char domain[100];
+	int state;
+	pj_str_t call_number;
 	pjmedia_port *sc, *sc_2;
 	pjmedia_port* rev;
 	pjmedia_port* rev_1;
 	int slot, slot_1;
 	pjmedia_snd_port *snd_port;
 	pjsua_acc_id acc_id;
+	pjsua_call_id call_id;
 	/* add pjmedia conf */
 	pjmedia_conf *media_conf, *media_conf_2;
 	pjmedia_port *mp, *mp_2;
