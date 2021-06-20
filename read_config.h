@@ -1,4 +1,13 @@
 #include <pjsua-lib/pjsua.h>
+
+struct call_data
+{
+  pj_pool_t           *pool;
+  pjmedia_conf        *conf;
+  pjmedia_port        *cport;
+  int                 call_slot_0;
+  int 		      call_slot_1;	
+};
 struct config{
 	/* sip */
 	int sip_port;
@@ -7,9 +16,6 @@ struct config{
 	int inc_timeout;
 	int in_call_timeout;
 	int delayed_timeout;
-	/* rtp */
-	int audio_rtp_port;
-	int text_rtp_port;
 
 	/* sound */
 	int sound_id;
@@ -35,6 +41,7 @@ struct config{
 	pjmedia_conf *media_conf, *media_conf_2;
 	pjmedia_port *mp, *mp_2;
 	int p_slot;
+	struct call_data *cd;
 
 };
 void del_line(char *src);

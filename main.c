@@ -7,7 +7,7 @@
 #define THIS_FILE "APP"
 
 #define USE_CUCM 0
-#define CHANNEL_NUM 2
+#define CHANNEL_NUM 3
 
 pj_pool_t *pool;
 pjmedia_port *conf;
@@ -57,30 +57,65 @@ static void on_call_media_state(pjsua_call_id call_id)
 {
 	pjsua_call_info ci;
 	pj_str_t contact_number;
+	int i;
 
 	pjsua_call_get_info(call_id, &ci);
 	contact_number = get_num_from_call(ci.local_contact.ptr);
 
 	if (ci.media_status == PJSUA_CALL_MEDIA_ACTIVE) {
-		if ((strcmp(contact_number.ptr, ar_config[0].username) == 0) && (ar_config[0].sound_id != 0)) {
-			pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[0].slot);
-			pjsua_conf_connect(ar_config[0].slot, pjsua_call_get_conf_port(call_id));
-		}
-		else if ((strcmp(contact_number.ptr, ar_config[1].username) == 0) && (ar_config[1].sound_id != 0)) {
-			pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[1].slot);
-			pjsua_conf_connect(ar_config[1].slot, pjsua_call_get_conf_port(call_id));
-		}
-		else if ((strcmp(contact_number.ptr, ar_config[2].username) == 0) && (ar_config[2].sound_id != 0)) {
-			pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[2].slot);
-			pjsua_conf_connect(ar_config[2].slot, pjsua_call_get_conf_port(call_id));
-		}
-		else if ((strcmp(contact_number.ptr, ar_config[3].username) == 0) && (ar_config[3].sound_id != 0)) {
-			pjsua_conf_connect(pjsua_call_get_conf_port(call_id), ar_config[3].slot);
-			pjsua_conf_connect(ar_config[3].slot, pjsua_call_get_conf_port(call_id));
-		}									
+		for (i = 0 ; i < CHANNEL_NUM; i++){
+			if ((strcmp(contact_number.ptr, ar_config[i].username) == 0)){
+				printf("on media state i = %d\n",i);
+				if (i % 2 == 0){
+					pjmedia_conf_connect_port(ar_config[i].cd->conf, ar_config[i].cd->call_slot_1, ar_config[i].slot, 0);
+            		pjmedia_conf_connect_port(ar_config[i].cd->conf, ar_config[i].slot , ar_config[i].cd->call_slot_1, 0);
+				}
+				else {
+					pjmedia_conf_connect_port(ar_config[i].cd->conf, ar_config[i].cd->call_slot_0, 0, 0);
+            		pjmedia_conf_connect_port(ar_config[i].cd->conf, 0, ar_config[i].cd->call_slot_0, 0);
+				}
+			}
+		}								
 	}
 }
+static void on_stream_created(pjsua_call_id call_id, 
+                              pjmedia_stream *sess,
+                              unsigned stream_idx, 
+                              pjmedia_port **p_port)
+{
+	pjsua_call_info ci;
+	pj_str_t contact_number;
+	int i;
 
+	pjsua_call_get_info(call_id, &ci);
+	contact_number = get_num_from_call(ci.local_contact.ptr);
+	for (i = 0; i < CHANNEL_NUM; i++){
+		if ((strcmp(contact_number.ptr, ar_config[i].username) == 0)){
+			printf("===========on stream create %s\n",contact_number.ptr);
+			if (i % 2 == 0) pjmedia_conf_add_port(ar_config[i].cd->conf, ar_config[i].cd->pool, *p_port, NULL, &ar_config[i].cd->call_slot_1);
+			else pjmedia_conf_add_port(ar_config[i].cd->conf, ar_config[i].cd->pool, *p_port, NULL, &ar_config[i].cd->call_slot_0);
+			break;
+		}
+	}
+}
+static void on_stream_destroyed(pjsua_call_id call_id, 
+                              pjmedia_stream *sess,
+                              unsigned stream_idx)
+{
+	pjsua_call_info ci;
+	pj_str_t contact_number;
+	int i;
+
+	pjsua_call_get_info(call_id, &ci);
+	contact_number = get_num_from_call(ci.local_contact.ptr);
+	for (i = 0; i < CHANNEL_NUM; i++){
+		if ((strcmp(contact_number.ptr, ar_config[i].username) == 0)){
+			if (i % 2 == 0) pjmedia_conf_remove_port(ar_config[i].cd->conf, ar_config[i].cd->call_slot_1);
+			else pjmedia_conf_remove_port(ar_config[i].cd->conf, ar_config[i].cd->call_slot_0);
+			break;
+		}
+	}
+}
 /* Display error and exit application */
 static void error_exit(const char *title, pj_status_t status)
 {
@@ -116,12 +151,14 @@ int main(int argc, char *argv[])
 		pjsua_media_config_default(&media_cfg);
         media_cfg.ec_options = PJMEDIA_ECHO_USE_SW_ECHO;
         media_cfg.clock_rate = 8000;
-        media_cfg.channel_count = CHANNEL_NUM;
+        media_cfg.channel_count = 1;
 
 		pjsua_config_default(&cfg);
 		cfg.cb.on_incoming_call = &on_incoming_call;
 		cfg.cb.on_call_media_state = &on_call_media_state;
 		cfg.cb.on_call_state = &on_call_state;
+		cfg.cb.on_stream_created= &on_stream_created;
+		cfg.cb.on_stream_destroyed= &on_stream_destroyed;
 		pjsua_logging_config_default(&log_cfg);
 		log_cfg.console_level = 4;
 
@@ -144,27 +181,43 @@ int main(int argc, char *argv[])
 	pool = pjsua_pool_create("pool", 2048, 2048);
 	conf = pjsua_set_no_snd_dev();
 
-	for (i = 0; i < CHANNEL_NUM; i++) {
-		printf("init sound device %d \n", i);
+	for (i = 0; i < CHANNEL_NUM; i += 2) {
+		pj_pool_t *pool1;
+		pool1 = pjsua_pool_create(NULL, 1000, 1000);
+		ar_config[i].cd = PJ_POOL_ZALLOC_T(pool1, struct call_data);
+		ar_config[i + 1].cd = ar_config[i].cd;
+		ar_config[i].cd->pool = pool1;
 
-		/* Get sound device index from name and update sound_id feild */
+		status = pjmedia_conf_create(pool1,
+						32,
+						PJMEDIA_PIA_SRATE(&conf->info),
+						1 /* stereo */,
+						PJMEDIA_PIA_SPF(&conf->info),
+						PJMEDIA_PIA_BITS(&conf->info),
+						PJMEDIA_CONF_NO_DEVICE, &ar_config[i].cd->conf);
+		ar_config[i].cd->cport = pjmedia_conf_get_master_port(ar_config[i].cd->conf);
+
 		status = pjmedia_aud_dev_lookup("ALSA", ar_config[i].sound_name, &ar_config[i].sound_id);
 		if (status != PJ_SUCCESS) {
 			PJ_LOG(3, (__FILE__, "get sound device %d failed", i));
-			continue;
-		}
+		} else printf("======= get sound device success \n");
 
-		status = pjmedia_snd_port_create(pool, ar_config[i].sound_id, ar_config[i].sound_id,
+		status = pjmedia_snd_port_create(ar_config[i].cd->pool, ar_config[i].sound_id, ar_config[i].sound_id,
 				PJMEDIA_PIA_SRATE(&conf->info),
 				2 /* stereo */,
 				2 * PJMEDIA_PIA_SPF(&conf->info),
 				PJMEDIA_PIA_BITS(&conf->info),
 				0, &ar_config[i].snd_port);
 
-		pjmedia_snd_port_set_ec(ar_config[i].snd_port, pool, 300, PJMEDIA_ECHO_SIMPLE);
+		//pjmedia_snd_port_set_ec(ar_config[0].snd_port, pool, 300, PJMEDIA_ECHO_SIMPLE);
+		if (status == PJ_SUCCESS) printf ("====== create sound %d success \n", i);
+		else {
+			printf ("====== create sound %d failed \n", i);
+			continue;
+		}
 
 		/* Create stereo-mono splitter/combiner */
-		status = pjmedia_splitcomb_create(pool, 
+		status = pjmedia_splitcomb_create(ar_config[i].cd->pool, 
 				PJMEDIA_PIA_SRATE(&conf->info),
 				2 /* stereo */,
 				2 * PJMEDIA_PIA_SPF(&conf->info),
@@ -172,13 +225,15 @@ int main(int argc, char *argv[])
 				0, &ar_config[i].sc);
 		
 		/* Connect channel0 (left channel?) to conference port slot0 */
-		status = pjmedia_splitcomb_set_channel(ar_config[i].sc, 0, 0, conf);
+		printf("============i = %d\n", i);
+		status = pjmedia_splitcomb_set_channel(ar_config[i].sc, 1, 0, ar_config[i].cd->cport);
 		
 		/* Create reverse channel for channel1 (right channel?)... */
-		status = pjmedia_splitcomb_create_rev_channel(pool, ar_config[i].sc, 1, 0, &ar_config[i].rev);
+		status = pjmedia_splitcomb_create_rev_channel(ar_config[i].cd->pool, ar_config[i].sc, 0, 0, &ar_config[i].rev);
 
 		pjmedia_snd_port_connect(ar_config[i].snd_port, ar_config[i].sc);
-		pjsua_conf_add_port(pool, ar_config[i].rev, &ar_config[i].slot);
+        pjmedia_conf_add_port(ar_config[i].cd->conf, ar_config[i].cd->pool, ar_config[i].rev, NULL, &ar_config[i].slot);
+        printf("ar_config[0].slot = %d\n", ar_config[i].slot);
 	}
 
 	for(i = 0; i < CHANNEL_NUM; i++) {
@@ -202,7 +257,8 @@ int main(int argc, char *argv[])
 		cfg.cred_info[0].data = pj_str(ar_config[i].secret);
 		printf ("id : %s, reg_uri : %s, secret : %s \n",cfg.id.ptr,cfg.reg_uri.ptr,cfg.cred_info[0].data.ptr);
 		status = pjsua_acc_add(&cfg, PJ_TRUE, &ar_config[i].acc_id);
-		if (status != PJ_SUCCESS) error_exit("Error adding account 0", status);
+		if (status != PJ_SUCCESS) printf("Error adding account %d \n ", i);
+
 		//status = pjsua_acc_set_transport(cfg, cfg_transport_id[i]);
 		//if (status != PJ_SUCCESS) error_exit("Error set transpoet ID", status);
 
@@ -219,12 +275,12 @@ int main(int argc, char *argv[])
 		if (option[0] == 'q')
 			break;
 		if (option[0] == 'm') {
-			pj_str_t uri1 = pj_str("sip:522601@192.168.1.198");
+			pj_str_t uri1 = pj_str("sip:996894@192.168.1.50");
 			status = pjsua_call_make_call(ar_config[0].acc_id, &uri1, 0, NULL, NULL, NULL);
 		}
 		if (option[0] == 'p') {
-			pj_str_t uri1 = pj_str("sip:522602@192.168.1.198");
-			status = pjsua_call_make_call(ar_config[1].acc_id, &uri1, 0, NULL, NULL, NULL);
+			pj_str_t uri1 = pj_str("sip:996893@192.168.1.50");
+			status = pjsua_call_make_call(ar_config[0].acc_id, &uri1, 0, NULL, NULL, NULL);
 		}
         if (option[0] == 'n') {
                 pj_str_t uri1 = pj_str("sip:996892@192.168.1.198");
